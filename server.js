@@ -8,6 +8,7 @@ const port = process.env.PORT || 3344;
 dotenv.config();
 
 const authRoutes = require("./routes/auth.route");
+const seedersRoutes = require("./routes/seeder.route");
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -21,6 +22,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/auth", authRoutes);
+app.use("/api/seeder", seedersRoutes);
 
 app.listen(port, () => {
   console.log(`Server running on port http://localhost:${port}`);
