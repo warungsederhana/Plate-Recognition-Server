@@ -8,3 +8,8 @@ exports.checkAuthHeader = (req, res) => {
   }
   return true;
 };
+
+exports.removeUndefinedProps = (obj) => {
+  Object.keys(obj).forEach((key) => obj[key] === undefined && delete obj[key]);
+  return obj;
+};
