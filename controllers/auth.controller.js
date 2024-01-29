@@ -1,6 +1,9 @@
 const admin = require("../lib/firebase/admin");
-const userSchema = require("../schemas/user.schema");
+const userSchema = require("../Schemas/user.schema");
 const { getAuth } = require("firebase-admin/auth");
+const firebase = require("../lib/firebase/firebase");
+const { getAuth: firebaseGetAuth } = require("firebase/auth");
+const { signInWithEmailAndPassword } = require("firebase/auth");
 const db = admin.firestore();
 
 exports.signup = async (req, res) => {
@@ -31,6 +34,32 @@ exports.signup = async (req, res) => {
       success: true,
       message: "User created successfully",
       data: user,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+exports.signin = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const userCredential = await signInWithEmailAndPassword(
+      firebaseGetAuth(firebase),
+      email,
+      password
+    );
+    const token = await userCredential.user.getIdToken();
+
+    return res.status(200).send({
+      success: true,
+      message: "User signed in successfully",
+      data: {
+        access_token: token,
+      },
     });
   } catch (error) {
     return res.status(500).json({

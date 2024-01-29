@@ -30,7 +30,6 @@ const isUserMiddleware = async (req, res, next) => {
     }
 
     req.user = doc.data();
-    console.log(req.user);
 
     return next();
   } catch (error) {
