@@ -46,6 +46,7 @@ exports.getUserById = async (req, res) => {
 
 // update user profile by id
 exports.updateUserById = async (req, res) => {
+  console.log("Update user by id");
   const userId = req.user.id;
 
   const { email, nama, nik, alamat, id_kendaraan, id_tagihan_pajak, id_pembayaran_pajak } =
