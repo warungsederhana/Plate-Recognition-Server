@@ -31,30 +31,10 @@ const userSchema = z.object({
     })
     .optional(),
 
-  // Relationship
-
-  id_kendaraan: z
-    .array(
-      z.string({
-        invalid_type_error: "ID kendaraan must be a string",
-      })
-    )
-    .optional(),
-
-  id_tagihan_pajak: z
-    .array(
-      z.string({
-        invalid_type_error: "ID tagihan pajak must be a string",
-      })
-    )
-    .optional(),
-
-  id_pembayaran_pajak: z
-    .array(
-      z.string({
-        invalid_type_error: "ID pembayaran pajak must be a string",
-      })
-    )
+  no_telp: z
+    .string({
+      invalid_type_error: "No Telp must be a string",
+    })
     .optional(),
 });
 
