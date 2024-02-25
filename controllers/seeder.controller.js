@@ -5,7 +5,8 @@ const merkSchema = require("../Schemas/merkKendaraan.schema");
 const jenisSchema = require("../Schemas/jenisKendaraan.schema");
 const typeSchema = require("../Schemas/typeKendaraan.schema");
 const { convertUSDToIDR } = require("../utils/converter.util");
-const tagihanPajakSchema = require("../Schemas/tagihanPajak.schema");
+const fs = require("fs");
+const path = require("path");
 const admin = require("../lib/firebase/admin");
 const db = admin.firestore();
 
@@ -17,35 +18,22 @@ const addYearsToDate = (date, yearsToAdd) => {
 
 exports.negaraSeed = async (req, res) => {
   const collectionName = "NegaraAsal";
-  const countries = new Set();
-  const countryCodes = new Set();
-  const seeds = [];
 
-  while (seeds.length < 10) {
-    const countryName = faker.location.country();
-    const countryCode = faker.location.countryCode("numeric");
-
-    // Check if country name and country code are unique
-    if (!countries.has(countryName) && !countryCodes.has(countryCode)) {
-      countries.add(countryName);
-      countryCodes.add(countryCode);
-      seeds.push({ nama_negara: countryName, kode_negara: countryCode });
-    }
-  }
-
-  console.log(seeds);
+  const seeds = JSON.parse(fs.readFileSync(path.join(__dirname, "../listNegara.json"), "utf8"));
 
   try {
     const collectionRef = db.collection(collectionName);
     const batch = db.batch();
 
     for (const seed of seeds) {
-      console.log(`Seeding negara ${seed.nama_negara}...`);
+      console.log(`Seeding negara ${seed.Country}...`);
       const docRef = collectionRef.doc();
 
       const negara = {
-        id: docRef.id,
-        ...seed,
+        uid: docRef.id,
+        id: seed["Numeric code"],
+        nama_negara: seed["Country"],
+        kode_negara: seed["Alpha-3 code"],
       };
 
       const verifyNegara = negaraSchema.safeParse(negara);
@@ -106,12 +94,17 @@ exports.merkSeed = async (req, res) => {
       console.log(`Seeding merk ${seed.nama_merk}...`);
       const docRef = collectionRef.doc();
 
-      const verifyMerk = merkSchema.safeParse(seed);
+      const merkKendaraan = {
+        uid: docRef.id,
+        ...seed,
+      };
+
+      const verifyMerk = merkSchema.safeParse(merkKendaraan);
       if (verifyMerk.success) {
         batch.set(docRef, {
-          ...seed,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
+          ...merkKendaraan,
+          createdAt: new Date(),
+          updatedAt: new Date(),
         });
       }
     }
@@ -148,7 +141,7 @@ exports.jenisSeed = async (req, res) => {
       jenisName.split(" ").length > 1
         ? jenisName
             .split(" ")
-            .map((word) => word[0])
+            .map((word) => word[0].toUpperCase())
             .join("")
         : jenisName.substring(0, 2).toUpperCase();
 
@@ -173,12 +166,17 @@ exports.jenisSeed = async (req, res) => {
       console.log(`Seeding jenis ${seed.nama_jenis_kendaraan}...`);
       const docRef = collectionRef.doc();
 
-      const verifyJenis = jenisSchema.safeParse(seed);
+      const jenisKendaraan = {
+        uid: docRef.id,
+        ...seed,
+      };
+
+      const verifyJenis = jenisSchema.safeParse(jenisKendaraan);
       if (verifyJenis.success) {
         batch.set(docRef, {
-          ...seed,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
+          ...jenisKendaraan,
+          createdAt: new Date(),
+          updatedAt: new Date(),
         });
       }
     }
@@ -244,12 +242,17 @@ exports.typeSeed = async (req, res) => {
       console.log(`Seeding type ${seed.nama_type_kendaraan}...`);
       const docRef = collectionRef.doc();
 
-      const verifyType = typeSchema.safeParse(seed);
+      const typeKendaraan = {
+        uid: docRef.id,
+        ...seed,
+      };
+
+      const verifyType = typeSchema.safeParse(typeKendaraan);
       if (verifyType.success) {
         batch.set(docRef, {
-          ...seed,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
+          ...typeKendaraan,
+          createdAt: new Date(),
+          updatedAt: new Date(),
         });
       }
     }
@@ -292,6 +295,7 @@ exports.kendaraanSeed = async (req, res) => {
       const tgl_stnk = faker.date.recent();
       const tgl_jth_tempo = faker.date.recent();
       const kendaraan = {
+        id: faker.string.alphanumeric(12),
         no_daftar: faker.string.numeric(10),
         no_daftar_eri: faker.string.numeric(10),
         id_kepemilikan: faker.string.numeric(16),
@@ -374,7 +378,7 @@ exports.kendaraanSeed = async (req, res) => {
       const docRef = collectionRef.doc();
 
       const kendaraan = {
-        id: docRef.id,
+        uid: docRef.id,
         ...seed,
       };
 
