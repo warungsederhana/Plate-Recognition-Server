@@ -4,29 +4,15 @@ const negaraSchema = require("../Schemas/negaraAsal.schema");
 const merkSchema = require("../Schemas/merkKendaraan.schema");
 const jenisSchema = require("../Schemas/jenisKendaraan.schema");
 const typeSchema = require("../Schemas/typeKendaraan.schema");
+const { convertUSDToIDR } = require("../utils/converter.util");
 const tagihanPajakSchema = require("../Schemas/tagihanPajak.schema");
 const admin = require("../lib/firebase/admin");
 const db = admin.firestore();
-
-const convertUSDToIDR = (usd, exchangeRate = 14500) => {
-  return usd * exchangeRate;
-};
 
 const addYearsToDate = (date, yearsToAdd) => {
   const newDate = new Date(date);
   newDate.setFullYear(newDate.getFullYear() + yearsToAdd);
   return newDate;
-};
-
-const formatIsoDateToDDMMYYYY = (isoDateString, yearsToAdd = 0) => {
-  const date = new Date(isoDateString);
-  date.setFullYear(date.getFullYear() + yearsToAdd); // Adding the years
-
-  const day = date.getDate().toString().padStart(2, "0");
-  const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Months are zero-indexed
-  const year = date.getFullYear();
-
-  return `${day}/${month}/${year}`;
 };
 
 exports.negaraSeed = async (req, res) => {
@@ -398,7 +384,7 @@ exports.kendaraanSeed = async (req, res) => {
 
       if (verifyKendaraan.success) {
         batch.set(docRef, {
-          ...seed,
+          ...kendaraan,
           createdAt: new Date(),
           updatedAt: new Date(),
         });
