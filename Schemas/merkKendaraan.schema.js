@@ -1,7 +1,6 @@
 const { z } = require("zod");
 
 const merkKendaraanSchema = z.object({
-  uid: z.string(),
   id: z.string({
     required_error: "ID merk kendaraan is required",
     invalid_type_error: "ID merk kendaraan must be a string",
