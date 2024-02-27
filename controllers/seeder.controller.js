@@ -41,8 +41,8 @@ exports.negaraSeed = async (req, res) => {
       if (verifyNegara.success) {
         batch.set(docRef, {
           ...negara,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
+          createdAt: new Date(),
+          updatedAt: new Date(),
         });
       }
     }

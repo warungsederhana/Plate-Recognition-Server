@@ -1,4 +1,5 @@
 const kendaraanSchema = require("../Schemas/kendaraan.schema");
+const { z } = require("zod");
 const admin = require("../lib/firebase/admin");
 const {
   updateTimestampsInObject,
@@ -65,8 +66,16 @@ exports.createKendaraan = async (req, res) => {
     const newKendaraan = req.body;
     const updatedKendaraan = convertStringsToDateObjects(newKendaraan);
     const validatedKendaraan = kendaraanSchema.safeParse(updatedKendaraan);
-
-    if (!validatedKendaraan.success) throw new Error(validatedKendaraan.error.message);
+    if (!validatedKendaraan.success) {
+      const errors = [];
+      for (const error of validatedKendaraan.error.issues) {
+        errors.push(`${error.path}: ${error.message}`);
+      }
+      return res.status(400).json({
+        success: false,
+        message: errors,
+      });
+    }
 
     const kendaraanId = validatedKendaraan.data.id;
     const q = db.collection("Kendaraan").where("id", "==", kendaraanId);
@@ -121,7 +130,16 @@ exports.updateKendaraan = async (req, res) => {
 
     console.log(updatedData);
 
-    if (!validatedKendaraan.success) throw new Error(validatedKendaraan.error.message);
+    if (!validatedKendaraan.success) {
+      const errors = [];
+      for (const error of validatedKendaraan.error.issues) {
+        errors.push(`${error.path}: ${error.message}`);
+      }
+      return res.status(400).json({
+        success: false,
+        message: errors,
+      });
+    }
 
     await docRef.update({
       ...validatedKendaraan.data,

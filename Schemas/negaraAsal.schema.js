@@ -1,7 +1,6 @@
 const { z } = require("zod");
 
 const negaraAsalSchema = z.object({
-  uid: z.string(),
   id: z.string({
     required_error: "ID negara asal is required",
     invalid_type_error: "ID negara asal must be a string",
