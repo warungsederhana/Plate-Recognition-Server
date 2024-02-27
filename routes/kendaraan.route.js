@@ -3,6 +3,9 @@ const controller = require("../controllers/kendaraan.controller");
 const router = express.Router();
 
 router.get("/", controller.getAllKendaraan);
-router.get("/:id", controller.getKendaraanById);
+router.post("/", controller.createKendaraan);
+router.get("/:uid", controller.getKendaraanById);
+router.put("/:uid", controller.updateKendaraan);
+router.delete("/:uid", controller.deleteKendaraan);
 
 module.exports = router;
