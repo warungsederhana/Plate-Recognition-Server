@@ -11,6 +11,7 @@ const authRoutes = require("./routes/auth.route");
 const seedersRoutes = require("./routes/seeder.route");
 const kendaraanRoutes = require("./routes/kendaraan.route");
 const userRoutes = require("./routes/user.route");
+const negaraAsalRoutes = require("./routes/negaraAsal.route");
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -27,6 +28,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/seeder", seedersRoutes);
 app.use("/api/kendaraan", kendaraanRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/negara-asal", negaraAsalRoutes);
 
 app.listen(port, () => {
   console.log(`Server running on port http://localhost:${port}`);
