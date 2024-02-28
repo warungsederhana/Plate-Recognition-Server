@@ -14,6 +14,7 @@ const userRoutes = require("./routes/user.route");
 const negaraAsalRoutes = require("./routes/negaraAsal.route");
 const merkKendaraan = require("./routes/merk.route");
 const jenisKendaraan = require("./routes/jenisKendaraan.route");
+const typeKendaraan = require("./routes/typeKendaraan.route");
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -33,6 +34,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/negara-asal", negaraAsalRoutes);
 app.use("/api/merk-kendaraan", merkKendaraan);
 app.use("/api/jenis-kendaraan", jenisKendaraan);
+app.use("/api/type-kendaraan", typeKendaraan);
 
 app.listen(port, () => {
   console.log(`Server running on port http://localhost:${port}`);
