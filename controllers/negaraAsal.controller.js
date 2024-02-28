@@ -102,12 +102,7 @@ exports.getNegaraAsalById = async (req, res) => {
     const negara = await db.collection("NegaraAsal").doc(uid).get();
     const data = negara.data();
 
-    if (!data) {
-      return res.status(404).json({
-        success: false,
-        message: "Negara asal not found",
-      });
-    }
+    if (!data) throw new Error("Negara asal not found");
 
     const validData = updateTimestampsInObject(data);
 
@@ -116,7 +111,12 @@ exports.getNegaraAsalById = async (req, res) => {
       message: "Get negara asal by id successfully",
       data: validData,
     });
-  } catch (error) {}
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
 };
 
 exports.updateNegaraAsal = async (req, res) => {
@@ -127,16 +127,11 @@ exports.updateNegaraAsal = async (req, res) => {
     const docRef = db.collection("NegaraAsal").doc(uid);
     const negara = await docRef.get();
 
-    if (!negara.exists) {
-      return res.status(404).json({
-        success: false,
-        message: "Negara asal not found",
-      });
-    }
+    if (!negara.exists) throw new Error("Negara asal not found");
 
     const updatedData = convertStringsToDateObjects(updatedNegara);
-    const validatedNegara = negaraSchema.safeParse(updatedData);
 
+    const validatedNegara = negaraSchema.safeParse(updatedData);
     if (!validatedNegara.success) {
       const errors = [];
       for (const error of validatedNegara.error.issues) {
@@ -173,12 +168,7 @@ exports.deleteNegaraAsal = async (req, res) => {
     const docRef = db.collection("NegaraAsal").doc(uid);
     const negara = await docRef.get();
 
-    if (!negara.exists) {
-      return res.status(404).json({
-        success: false,
-        message: "Negara asal not found",
-      });
-    }
+    if (!negara.exists) throw new Error("Negara asal not found");
 
     await docRef.delete();
 
