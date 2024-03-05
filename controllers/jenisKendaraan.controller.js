@@ -8,7 +8,11 @@ const db = admin.firestore();
 
 exports.getAllJenisKendaraan = async (req, res) => {
   try {
-    const jenisKendaraans = await db.collection("JenisKendaraan").get();
+    const jenisKendaraans = await db
+      .collection("JenisKendaraan")
+      .orderBy("createdAt", "desc")
+      .get();
+    const size = jenisKendaraans.size;
     const data = jenisKendaraans.docs.map((doc) => doc.data());
 
     const validData = updateTimestampsInObject(data);
@@ -16,6 +20,8 @@ exports.getAllJenisKendaraan = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "Get all jenis kendaraan successfully",
+      size: size,
+      title: "JENIS KENDARAAN",
       data: validData,
     });
   } catch (error) {
@@ -175,6 +181,33 @@ exports.deleteJenisKendaraan = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "Delete jenis kendaraan successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// ambil data 5 jenis kendaraan terbaru
+exports.getLatestJenisKendaraan = async (req, res) => {
+  try {
+    const jenisKendaraans = await db
+      .collection("JenisKendaraan")
+      .orderBy("createdAt", "desc")
+      .limit(5)
+      .select("id", "nama_jenis_kendaraan", "kode_jenis_kendaraan", "jumlah_sumbu")
+      .get();
+    const data = jenisKendaraans.docs.map((doc) => doc.data());
+
+    const validData = updateTimestampsInObject(data);
+
+    return res.status(200).json({
+      success: true,
+      message: "Get latest jenis kendaraan successfully",
+      title: "JENIS KENDARAAN",
+      data: validData,
     });
   } catch (error) {
     return res.status(500).json({

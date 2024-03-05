@@ -4,6 +4,7 @@ const router = express.Router();
 
 router.get("/", controller.getAllMerk);
 router.post("/", controller.createMerk);
+router.get("/latest", controller.getLatestMerk);
 router.get("/:uid", controller.getMerkById);
 router.put("/:uid", controller.updateMerk);
 router.delete("/:uid", controller.deleteMerk);

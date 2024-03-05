@@ -8,7 +8,18 @@ const db = admin.firestore();
 
 exports.getAllNegaraAsal = async (req, res) => {
   try {
-    const negaras = await db.collection("NegaraAsal").get();
+    const searchQuery = req.query.nama_negara || ""; // Ambil query dari URL
+    const negarasRef = db.collection("NegaraAsal").orderBy("nama_negara");
+
+    // Jika ada query pencarian, gunakan where untuk filter
+    const negaras = searchQuery
+      ? await negarasRef
+          .where("nama_negara", ">=", searchQuery)
+          .where("nama_negara", "<=", searchQuery + "\uf8ff")
+          .get()
+      : await negarasRef.get();
+
+    const size = negaras.size;
     const data = negaras.docs.map((doc) => doc.data());
 
     const validData = updateTimestampsInObject(data);
@@ -16,6 +27,8 @@ exports.getAllNegaraAsal = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "Get all negara asal successfully",
+      size: size,
+      title: "NEGARA ASAL",
       data: validData,
     });
   } catch (error) {
@@ -178,6 +191,33 @@ exports.deleteNegaraAsal = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// ambil 5 data negara asal terbaru
+exports.getLatestNegaraAsal = async (req, res) => {
+  try {
+    const negaras = await db
+      .collection("NegaraAsal")
+      .orderBy("createdAt", "desc")
+      .limit(5)
+      .select("id", "nama_negara", "kode_negara")
+      .get();
+    const data = negaras.docs.map((doc) => doc.data());
+
+    const validData = updateTimestampsInObject(data);
+
+    return res.status(200).json({
+      success: true,
+      message: "Get latest negara asal successfully",
+      title: "NEGARA ASAL",
+      data: validData,
+    });
+  } catch (error) {
+    return res.status(500).json({
       success: false,
       message: error.message,
     });

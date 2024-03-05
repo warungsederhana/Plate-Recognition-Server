@@ -4,6 +4,7 @@ const router = express.Router();
 
 router.get("/", controller.getAllNegaraAsal);
 router.post("/", controller.createNegaraAsal);
+router.get("/latest", controller.getLatestNegaraAsal);
 router.get("/:uid", controller.getNegaraAsalById);
 router.put("/:uid", controller.updateNegaraAsal);
 router.delete("/:uid", controller.deleteNegaraAsal);

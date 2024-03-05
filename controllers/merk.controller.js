@@ -8,7 +8,8 @@ const db = admin.firestore();
 
 exports.getAllMerk = async (req, res) => {
   try {
-    const merks = await db.collection("MerkKendaraan").get();
+    const merks = await db.collection("MerkKendaraan").orderBy("createdAt", "desc").get();
+    const size = merks.size;
     const data = merks.docs.map((doc) => doc.data());
 
     const validData = updateTimestampsInObject(data);
@@ -16,6 +17,8 @@ exports.getAllMerk = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "Get all merk kendaraan successfully",
+      size: size,
+      title: "MERK KENDARAAN",
       data: validData,
     });
   } catch (error) {
@@ -182,6 +185,33 @@ exports.deleteMerk = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// ambil data 5 merk terbaru
+exports.getLatestMerk = async (req, res) => {
+  try {
+    const merks = await db
+      .collection("MerkKendaraan")
+      .orderBy("createdAt", "desc")
+      .limit(5)
+      .select("id", "nama_merk", "kode_negara_asal")
+      .get();
+    const data = merks.docs.map((doc) => doc.data());
+
+    const validData = updateTimestampsInObject(data);
+
+    return res.status(200).json({
+      success: true,
+      message: "Get latest merk kendaraan successfully",
+      title: "MERK KENDARAAN",
+      data: validData,
+    });
+  } catch (error) {
+    return res.status(500).json({
       success: false,
       message: error.message,
     });

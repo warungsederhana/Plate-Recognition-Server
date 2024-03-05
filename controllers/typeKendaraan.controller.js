@@ -8,7 +8,8 @@ const db = admin.firestore();
 
 exports.getAllTypeKendaraan = async (req, res) => {
   try {
-    const typeKendaraan = await db.collection("TypeKendaraan").get();
+    const typeKendaraan = await db.collection("TypeKendaraan").orderBy("createdAt", "desc").get();
+    const size = typeKendaraan.size;
     const data = typeKendaraan.docs.map((doc) => doc.data());
 
     const validData = updateTimestampsInObject(data);
@@ -16,6 +17,8 @@ exports.getAllTypeKendaraan = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "Get all type kendaraan successfully",
+      size: size,
+      title: "TYPE KENDARAAN",
       data: validData,
     });
   } catch (error) {
@@ -110,8 +113,8 @@ exports.createTypeKendaraan = async (req, res) => {
     const dataTypeKendaraan = {
       uid: docRef.id,
       ...validData.data,
-      created_at: new Date(),
-      updated_at: new Date(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
     };
 
     await docRef.set(dataTypeKendaraan);
@@ -219,6 +222,40 @@ exports.deleteTypeKendaraan = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "Delete type kendaraan successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// ambil data 5 type kendaraan terbaru
+exports.getLatestTypeKendaraan = async (req, res) => {
+  try {
+    const typeKendaraan = await db
+      .collection("TypeKendaraan")
+      .orderBy("createdAt", "desc")
+      .select(
+        "id",
+        "nama_type_kendaraan",
+        "nama_type_kendaraan_eri",
+        "id_jenis_kendaraan",
+        "id_merk_kendaraan",
+        "kode_negara_asal"
+      )
+      .limit(5)
+      .get();
+    const data = typeKendaraan.docs.map((doc) => doc.data());
+
+    const validData = updateTimestampsInObject(data);
+
+    return res.status(200).json({
+      success: true,
+      message: "Get latest type kendaraan successfully",
+      title: "TYPE KENDARAAN",
+      data: validData,
     });
   } catch (error) {
     return res.status(500).json({

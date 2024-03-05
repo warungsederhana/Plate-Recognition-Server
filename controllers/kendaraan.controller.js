@@ -12,7 +12,8 @@ const db = admin.firestore();
 exports.getAllKendaraan = async (req, res) => {
   console.log("Get all kendaraan");
   try {
-    const kendaraans = await db.collection("Kendaraan").get();
+    const kendaraans = await db.collection("Kendaraan").orderBy("createdAt", "desc").get();
+    const size = kendaraans.size;
     const data = kendaraans.docs.map((doc) => doc.data());
 
     // Mengubah timestamp menjadi Date, lalu memformatnya
@@ -21,6 +22,8 @@ exports.getAllKendaraan = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "Get all kendaraan successfully",
+      size: size,
+      title: "KENDARAAN",
       data: validData,
     });
   } catch (error) {
@@ -183,6 +186,34 @@ exports.deleteKendaraan = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// ambil data 5 kendaraan terbaru
+exports.getLatestKendaraan = async (req, res) => {
+  try {
+    const kendaraans = await db
+      .collection("Kendaraan")
+      .orderBy("createdAt", "desc")
+      .limit(5)
+      .select("nama_pemilik", "no_polisi", "no_bpkb", "no_mesin", "no_rangka")
+      .get();
+    const data = kendaraans.docs.map((doc) => doc.data());
+
+    // Mengubah timestamp menjadi Date, lalu memformatnya
+    const validData = updateTimestampsInObject(data);
+
+    return res.status(200).json({
+      success: true,
+      message: "Get latest kendaraan successfully",
+      title: "KENDARAAN",
+      data: validData,
+    });
+  } catch (error) {
+    return res.status(500).json({
       success: false,
       message: error.message,
     });
